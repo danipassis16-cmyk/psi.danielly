@@ -31,6 +31,329 @@ button[disabled]{opacity:.55;cursor:not-allowed}.quick-actions{display:flex;gap:
 @media(max-width:600px){.nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.nav button{font-size:.92rem}.table-wrap table{min-width:600px}}
 @media print{body{background:#fff;font-size:11pt}header{background:#fff;color:#000;border-bottom:2px solid #24584f;padding:12px}.panel{box-shadow:none;break-inside:avoid}.hidden{display:none!important}button,.quick-actions{display:none!important}a{color:#000;text-decoration:underline}.panel{border:1px solid #aaa;padding:12px;margin:8px 0}main{padding:0}}
 .contact-table{width:100%;border-collapse:collapse;font-size:.88rem}.contact-table th,.contact-table td{border:1px solid #cbd7d2;padding:7px;vertical-align:top}.contact-table th{background:#e7eee9;position:sticky;top:0}.table-wrap{overflow:auto;margin:10px 0 22px}.contact-table td:first-child{font-weight:600;min-width:150px}.contact-table td{min-width:135px}.contact-table a{overflow-wrap:anywhere}@media(max-width:700px){.contact-table{font-size:.8rem}.contact-table th,.contact-table td{padding:5px}}
+
+ 
+/* === MODO EDIÇÃO E PERSONALIZAÇÃO UBS 3 === */
+#editModeTriggerBtn {
+  position: fixed;
+  top: 14px;
+  right: 18px;
+  z-index: 9999;
+  background: #ffffff;
+  color: var(--green);
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+#editModeTriggerBtn:hover {
+  background: var(--soft);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+#editModeTriggerBtn .badge {
+  background: var(--green);
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.75rem;
+}
+
+/* Floating top toolbar when in edit mode */
+#editTopToolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #19332e;
+  color: #ffffff;
+  z-index: 9998;
+  padding: 8px 16px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+  font-size: 0.88rem;
+}
+#editTopToolbar.active {
+  display: flex;
+}
+body.in-edit-mode {
+  padding-top: 50px;
+}
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tb-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tb-btn-primary { background: #22c55e; color: #0f2e1b; }
+.tb-btn-primary:hover { background: #16a34a; color: #fff; }
+.tb-btn-panel { background: #38bdf8; color: #082f49; }
+.tb-btn-panel:hover { background: #0284c7; color: #fff; }
+.tb-btn-outline { background: transparent; color: #e2e8f0; border: 1px solid #64748b; }
+.tb-btn-outline:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.tb-btn-danger { background: #ef4444; color: #fff; }
+
+/* Visual highlight on editable elements */
+body.in-edit-mode [contenteditable="true"] {
+  outline: 2px dashed rgba(34, 197, 94, 0.45) !important;
+  outline-offset: 3px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline 0.15s ease, background 0.15s ease;
+}
+body.in-edit-mode [contenteditable="true"]:hover {
+  outline: 2px dashed rgba(34, 197, 94, 0.95) !important;
+  background-color: rgba(34, 197, 94, 0.08) !important;
+}
+body.in-edit-mode [contenteditable="true"]:focus {
+  outline: 3px solid #22c55e !important;
+  background-color: rgba(34, 197, 94, 0.12) !important;
+}
+
+/* Modals & Backdrop */
+.editor-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: none;
+  place-items: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+.editor-modal-backdrop.open {
+  display: grid;
+}
+.editor-modal-card {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  border: 1px solid #cbd5e1;
+  overflow: hidden;
+  animation: modalPop 0.2s ease-out;
+}
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.editor-modal-header {
+  background: var(--green);
+  color: #ffffff;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.editor-modal-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: bold;
+}
+.editor-modal-body {
+  padding: 20px;
+}
+.editor-form-group {
+  margin-bottom: 14px;
+}
+.editor-form-group label {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #334155;
+}
+.editor-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+.editor-input:focus {
+  outline: 3px solid #24584f;
+  border-color: #24584f;
+}
+.editor-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.editor-modal-tab {
+  flex: 1;
+  padding: 12px 14px;
+  text-align: center;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.editor-modal-tab.active {
+  color: var(--green);
+  border-bottom-color: var(--green);
+  background: #ffffff;
+}
+
+/* Customization Drawer / Panel */
+#customizationPanelDrawer {
+  position: fixed;
+  top: 0;
+  right: -520px;
+  width: 500px;
+  max-width: 95vw;
+  height: 100vh;
+  background: #ffffff;
+  z-index: 10001;
+  box-shadow: -8px 0 30px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-left: 1px solid #cbd5e1;
+}
+#customizationPanelDrawer.open {
+  right: 0;
+}
+.drawer-header {
+  padding: 16px 20px;
+  background: #19332e;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.drawer-tabs {
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+  overflow-x: auto;
+}
+.drawer-tab-btn {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.drawer-tab-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  border-bottom-color: #24584f;
+}
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+.drawer-footer {
+  padding: 14px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.color-picker-row label {
+  font-size: 0.88rem;
+  color: #334155;
+  font-weight: 500;
+}
+.color-picker-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.color-picker-inputs input[type="color"] {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  padding: 2px;
+  cursor: pointer;
+  background: none;
+}
+.color-picker-inputs input[type="text"] {
+  width: 85px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: monospace;
+}
+.saved-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #15803d;
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+  z-index: 10005;
+  font-weight: bold;
+  display: none;
+  animation: toastFade 0.3s ease-out;
+}
+@keyframes toastFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
+  #editModeTriggerBtn {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+    padding: 10px 14px;
+  }
+  #customizationPanelDrawer {
+    width: 100vw;
+  }
+}
+
 </style>
 </head>
 <body>
